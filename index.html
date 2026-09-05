@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You 🥺</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffeef2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 35px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .popup-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: none;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1 {
+            color: #d63384;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            min-height: 50px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .yes-btn {
+            background-color: #d63384;
+            color: white;
+        }
+
+        .yes-btn:hover {
+            background-color: #b8256f;
+            transform: scale(1.05);
+        }
+
+        .no-btn {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .result-screen {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio Element for Womp Womp Sound -->
+    <audio id="wompSound" src="https://assets.mixkit.co/active_storage/sfx/2874/2874-preview.mp3" preload="auto"></audio>
+
+    <div class="card">
+        
+        <!-- Pop-up image when clicking No -->
+        <img id="sadImage" class="popup-img" src="https://i.imgflip.com/1ur9b0.jpg" alt="Sad reaction">
+
+        <!-- Question 1 -->
+        <div id="q1" class="question-step">
+            <div class="emoji">🥺</div>
+            <h1>Hello, are you mad at me?</h1>
+            <div class="btn-container">
+                <button class="yes-btn" onclick="nextQuestion(1, 'yes')">Yes</button>
+                <button class="no-btn" onclick="nextQuestion(1, 'no')">No</button>
+            </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div id="q2" class="question-step" style="display: none;">
+            <div class="emoji" id="q2-emoji">🤔</div>
+            <h1 id="q2-title">Am I dumb?</h1>
+            <div class="btn-container">
+                <button class="yes-btn" onclick="nextQuestion(2, 'yes')">Yes</button>
+                <button class="no-btn" onclick="nextQuestion(2, 'no')">No</button>
+            </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div id="q3" class="question-step" style="display: none;">
+            <div class="emoji" id="q3-emoji">💭</div>
+            <h1 id="q3-title">Do you believe I understood why I was wrong?</h1>
+            <div class="btn-container">
+                <button class="yes-btn" onclick="nextQuestion(3, 'yes')">Yes</button>
+                <button class="no-btn" onclick="nextQuestion(3, 'no')">No</button>
+            </div>
+        </div>
+
+        <!-- Question 4 (Final Question with Dodging No Button) -->
+        <div id="q4" class="question-step" style="display: none;">
+            <div class="emoji" id="q4-emoji">❤️</div>
+            <h1 id="q4-title">Can you forgive me?</h1>
+            <div class="btn-container">
+                <button class="yes-btn" onclick="finishQuiz('yes')">Yes ❤️</button>
+                <button id="dodgingNoBtn" class="no-btn" onmouseover="triggerNoEffects()" onclick="triggerNoEffects()">No 😜</button>
+            </div>
+        </div>
+
+        <!-- Final Result Screen -->
+        <div id="finalResult" class="result-screen">
+            <div class="emoji" id="finalEmoji">💖</div>
+            <h1 id="finalText"></h1>
+        </div>
+
+    </div>
+
+    <script>
+        const wompSound = document.getElementById('wompSound');
+        const sadImage = document.getElementById('sadImage');
+
+        function triggerNoEffects() {
+            // Play Womp Womp Sound
+            wompSound.currentTime = 0;
+            wompSound.play().catch(e => console.log("Audio play prevented"));
+
+            // Show Sad Pop-up Image
+            sadImage.style.display = 'block';
+
+            // Make the No button dodge position
+            const noBtn = document.getElementById('dodgingNoBtn');
+            const padding = 20;
+            const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+            const randomX = Math.floor(Math.random() * (maxX - padding)) + padding;
+            const randomY = Math.floor(Math.random() * (maxY - padding)) + padding;
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${randomX}px`;
+            noBtn.style.top = `${randomY}px`;
+        }
+
+        function nextQuestion(currentQ, answer) {
+            sadImage.style.display = 'none'; // Hide reaction photo on next step
+
+            if (currentQ === 1) {
+                document.getElementById('q1').style.display = 'none';
+                document.getElementById('q2').style.display = 'block';
+                
+                // Q1 Logic
+                if (answer === 'yes') {
+                    document.getElementById('q2-emoji').innerText = '😔';
+                } else {
+                    document.getElementById('q2-emoji').innerText = '🎉';
+                    document.getElementById('q2-title').innerText = 'YAYYYY! Am I dumb?';
+                }
+            } else if (currentQ === 2) {
+                document.getElementById('q2').style.display = 'none';
+                document.getElementById('q3').style.display = 'block';
+
+                // Q2 Logic
+                if (answer === 'no') {
+                    document.getElementById('q3-title').innerText = 'whyyyy did you lie 😂 Do you believe I understood why I was wrong?';
+                } else {
+                    document.getElementById('q3-title').innerText = 'ik I love you ❤️ Do you believe I understood why I was wrong?';
+                }
+            } else if (currentQ === 3) {
+                document.getElementById('q3').style.display = 'none';
+                document.getElementById('q4').style.display = 'block';
+
+                // Q3 Logic
+                if (answer === 'yes') {
+                    document.getElementById('q4-title').innerText = 'Thank you for trusting me 🥺 Can you forgive me?';
+                } else {
+                    document.getElementById('q4-title').innerText = 'I\'m sorry if I made you think that 💔 Can you forgive me?';
+                }
+            }
+        }
+
+        function finishQuiz(answer) {
+            document.getElementById('q4').style.display = 'none';
+            sadImage.style.display = 'none';
+            document.getElementById('finalResult').style.display = 'block';
+
+            document.getElementById('finalEmoji').innerText = '🥺❤️';
+            document.getElementById('finalText').innerText = 'I love you, please don\'t hold a grudge on me, I can be dumb 😔';
+        }
+    </script>
+
+</body>
+</html>
